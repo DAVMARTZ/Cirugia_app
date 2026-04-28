@@ -6,3 +6,5 @@ pillow
 packaging
 reportlab
 streamlit-drawable-canvas-fix
+openai
+groq

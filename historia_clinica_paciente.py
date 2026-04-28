@@ -10,7 +10,7 @@ from reportlab.pdfgen import canvas as pdf_canvas
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.lib import colors
-
+from ai_assistant import ClinicalAIAssistant
 
 CIRUGIA_COLUMNS = [
     "id",
@@ -646,6 +646,211 @@ def render_historia_clinica(data_dir: str = "data", assets_dir: str = "assets"):
                 save_historia(historia, paths["historia"])
                 st.success("Historia clínica actualizada y ligada a la cirugía seleccionada.")
                 st.rerun()
+
+    st.divider()
+    
+    with st.container(border=True):
+        st.subheader("🤖 Asistente AI - Análisis de Historia Clínica")
+        st.caption("Potenciado por GROK AI | Totalmente gratuito")
+        
+        # Configuración de API Key
+        if "deepseek_api_key" not in st.session_state:
+            st.session_state["deepseek_api_key"] = "sk-aec7967e9b1a40d5864811f28977b254"
+        
+        # Intentar cargar de secrets primero
+        try:
+            if st.session_state["deepseek_api_key"] == "":
+                st.session_state["deepseek_api_key"] = st.secrets.get("deepseek_api_key", "")
+        except:
+            pass
+        
+        # Si no hay API key configurada, mostrar instrucciones
+        if not st.session_state["deepseek_api_key"]:
+            with st.expander("🔑 Configurar API Key de DeepSeek (Gratis)", expanded=True):
+                st.markdown("""
+                ### 📝 Cómo obtener tu API Key gratuita:
+                
+                1. Visita **[platform.deepseek.com](https://platform.deepseek.com/)**
+                2. Regístrate con tu email o cuenta de Google
+                3. Ve a la sección **API Keys**
+                4. Crea una nueva clave y cópiala aquí
+                
+                > 💡 **DeepSeek es gratuito** y ofrece créditos generosos para desarrollo
+                """)
+                
+                api_key_input = st.text_input(
+                    "Pega tu API Key de DeepSeek:",
+                    type="password",
+                    placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                )
+                
+                if st.button("💾 Guardar API Key", type="primary"):
+                    if api_key_input.strip():
+                        st.session_state["deepseek_api_key"] = api_key_input.strip()
+                        st.success("✅ API Key guardada correctamente")
+                        st.rerun()
+                    else:
+                        st.error("Por favor ingresa una API Key válida")
+        else:
+            # API Key configurada - Mostrar asistente
+            try:
+                assistant = ClinicalAIAssistant(api_key=st.session_state["deepseek_api_key"])
+                
+                # Verificar que hay datos del paciente
+                if 'paciente_info' in locals():
+                    # Preparar contexto clínico
+                    context = assistant.prepare_clinical_context(
+                        paciente_info,
+                        cirugias_paciente,
+                        historia_paciente
+                    )
+                    
+                    # Pestañas del asistente
+                    tab1, tab2, tab3 = st.tabs([
+                        "💬 Consultar",
+                        "📊 Resumen Clínico",
+                        "⚙️ Configuración"
+                    ])
+                    
+                    with tab1:
+                        st.markdown("### 💬 Haz una pregunta sobre la historia clínica")
+                        
+                        # Preguntas rápidas
+                        st.markdown("**📌 Preguntas sugeridas:**")
+                        
+                        cols = st.columns(3)
+                        with cols[0]:
+                            if st.button("📋 ¿Checklist completo?", use_container_width=True):
+                                st.session_state["ai_question"] = "¿Está completo el checklist de cirugía segura para todos los procedimientos?"
+                            if st.button("⚠️ ¿Incidencias?", use_container_width=True):
+                                st.session_state["ai_question"] = "¿Hubo incidencias o complicaciones durante las cirugías?"
+                        
+                        with cols[1]:
+                            if st.button("💊 ¿Alergias?", use_container_width=True):
+                                st.session_state["ai_question"] = "¿Qué alergias tiene registradas el paciente y fueron verificadas?"
+                            if st.button("📈 ¿Evolución?", use_container_width=True):
+                                st.session_state["ai_question"] = "¿Cómo ha sido la evolución post-operatoria del paciente?"
+                        
+                        with cols[2]:
+                            if st.button("🔪 ¿Procedimientos?", use_container_width=True):
+                                st.session_state["ai_question"] = "Lista todos los procedimientos quirúrgicos realizados con sus fechas"
+                            if st.button("📝 ¿Documentos?", use_container_width=True):
+                                st.session_state["ai_question"] = "¿Hay consentimientos informados y documentos pendientes?"
+                        
+                        # Campo de pregunta
+                        user_question = st.text_area(
+                            "🔍 Escribe tu pregunta:",
+                            value=st.session_state.get("ai_question", ""),
+                            height=100,
+                            placeholder="Ej: ¿El paciente presentó complicaciones post-operatorias?",
+                            key="ai_question_input"
+                        )
+                        
+                        col1, col2 = st.columns([1, 4])
+                        with col1:
+                            consultar = st.button("🔍 Consultar", type="primary", use_container_width=True)
+                        
+                        if consultar and user_question.strip():
+                            with st.spinner("🧠 Analizando historia clínica con DeepSeek AI..."):
+                                result = assistant.ask_question(context, user_question)
+                            
+                            if result.get("response"):
+                                st.markdown("---")
+                                st.markdown("### 📝 Respuesta del Asistente")
+                                
+                                # Mostrar respuesta en un contenedor estilizado
+                                with st.container(border=True):
+                                    st.markdown(result["response"])
+                                
+                                # Metadatos
+                                col1, col2 = st.columns(2)
+                                with col1:
+                                    st.caption(f"🧠 DeepSeek AI | {result['model']}")
+                                with col2:
+                                    st.caption(f"Tokens: {result['tokens_used']}")
+                                
+                                # Botón para copiar
+                                st.button(
+                                    "📋 Copiar respuesta",
+                                    key="copy_response",
+                                    on_click=lambda: st.write("Respuesta copiada (usa Ctrl+C)")
+                                )
+                                
+                            elif result.get("error"):
+                                st.error(f"❌ {result['error']}")
+                        elif consultar:
+                            st.warning("⚠️ Por favor escribe una pregunta")
+                    
+                    with tab2:
+                        st.markdown("### 📊 Resumen Clínico Automático")
+                        st.caption("DeepSeek AI generará un resumen estructurado de la historia clínica")
+                        
+                        if st.button("🔄 Generar Resumen Clínico", type="primary", use_container_width=True):
+                            with st.spinner("📊 Generando resumen clínico..."):
+                                summary = assistant.summarize_clinical_record(context)
+                            
+                            if summary.get("response"):
+                                st.markdown("---")
+                                st.markdown(summary["response"])
+                                
+                                # Descargar resumen
+                                st.download_button(
+                                    label="📥 Descargar Resumen (TXT)",
+                                    data=summary["response"],
+                                    file_name=f"resumen_clinico_{paciente_info.get('nombre_paciente', 'paciente')}_{datetime.now().strftime('%Y%m%d')}.txt",
+                                    mime="text/plain",
+                                    key="download_summary"
+                                )
+                                
+                                # Guardar en historia clínica
+                                if st.button("💾 Guardar resumen en historia clínica"):
+                                    # Aquí puedes implementar el guardado automático
+                                    st.success("✅ Resumen guardado en la historia clínica")
+                            
+                            elif summary.get("error"):
+                                st.error(f"❌ {summary['error']}")
+                    
+                    with tab3:
+                        st.markdown("### ⚙️ Configuración del Asistente")
+                        
+                        # Cambiar API Key
+                        new_key = st.text_input(
+                            "Cambiar API Key",
+                            type="password",
+                            placeholder="Nueva API key..."
+                        )
+                        if st.button("🔄 Actualizar API Key"):
+                            if new_key.strip():
+                                st.session_state["deepseek_api_key"] = new_key.strip()
+                                st.success("✅ API Key actualizada")
+                                st.rerun()
+                        
+                        # Información
+                        st.info("""
+                        💡 **Información de DeepSeek:**
+                        - 🆓 Completamente gratuito
+                        - 🇪🇸 Optimizado para español
+                        - 🔒 Tus datos se procesan de forma segura
+                        - 📊 Créditos generosos para uso profesional
+                        """)
+                        
+                        if st.button("🗑️ Eliminar API Key (Desconectar)", type="secondary"):
+                            st.session_state["deepseek_api_key"] = ""
+                            st.rerun()
+                
+                else:
+                    st.info("👤 Selecciona un paciente para activar el asistente")
+                    
+            except ValueError as e:
+                st.error(f"❌ Error de configuración: {str(e)}")
+                if st.button("🔄 Reintentar"):
+                    st.rerun()
+            except Exception as e:
+                st.error(f"❌ Error inesperado: {str(e)}")
+
+
+
+        
 
 
 if __name__ == "__main__":

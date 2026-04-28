@@ -1,0 +1,26 @@
+# En la terminal, desde la raíz de tu proyecto:
+cat > .gitignore << 'EOF'
+# Streamlit secrets (NUNCA SUBIR A GITHUB)
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.env
+
+# Datos sensibles
+*.key
+*.pem
+credentials.json
+
+# Sistema
+.DS_Store
+Thumbs.db
+EOF
