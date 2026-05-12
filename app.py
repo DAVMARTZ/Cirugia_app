@@ -95,6 +95,7 @@ checklist = cargar_csv(
 
 # SIDEBAR DESIGN
 with st.sidebar:
+    st.markdown('<div style="margin-top: -50px;"></div>', unsafe_allow_html=True)
     if os.path.exists(RUTA_LOGO):
         st.image(RUTA_LOGO, width=150)
     else:
@@ -117,6 +118,9 @@ with st.sidebar:
             "Historia Clínica del Paciente"
         ]
     )
+    
+    # Espaciador para empujar el botón hacia abajo
+    st.markdown("<br>" * 10, unsafe_allow_html=True)
     
     st.markdown("---")
     if st.button("🚪 Cerrar sesión"):
@@ -172,8 +176,27 @@ elif menu == "Cirugía":
 
 # =========================
 elif menu == "Historial de Pacientes":
-    st.title("📋 Historial de Pacientes")
-    st.dataframe(pacientes, use_container_width=True)
+    st.markdown("""
+        <div style="background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <h1 style="margin:0;">📋 Historial de Pacientes</h1>
+            <p style="color: #64748b;">Consulte y filtre la base de datos de pacientes registrados.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Buscador
+    busqueda = st.text_input("🔍 Buscar por nombre o documento", placeholder="Ej: Juan Pérez o 1010...")
+    
+    if busqueda:
+        df_filtrado = pacientes[
+            pacientes["nombre_paciente"].str.contains(busqueda, case=False, na=False) |
+            pacientes["numero_documento"].astype(str).str.contains(busqueda, na=False)
+        ]
+    else:
+        df_filtrado = pacientes
+
+    st.dataframe(df_filtrado, use_container_width=True, hide_index=True)
+    
+    st.info(f"Mostrando {len(df_filtrado)} pacientes de un total de {len(pacientes)}.")
 
 
 #==================================

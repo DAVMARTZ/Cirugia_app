@@ -1,1 +1,16 @@
 nombre_paciente,numero_documento,institucion,tipo_documento,fecha_nacimiento,sexo,edad
+Juan Pérez,1880964791,Sura,C.C,2002-06-23,Masculino,24
+María García,1486886929,Nueva EPS,C.C,2005-10-05,Femenino,21
+Luis Rodríguez,1150244803,Compensar,C.C,1968-05-28,Femenino,58
+Ana Martínez,1243359227,Nueva EPS,T.I,1976-02-25,Femenino,50
+Carlos López,1205049589,Salud Total,C.C,2009-05-03,Masculino,17
+Elena Gómez,1823717551,Sanitas,T.I,1999-05-18,Femenino,27
+Pedro Sánchez,1886708147,Sura,C.C,1963-01-07,Masculino,63
+Laura Díaz,1336613328,Salud Total,T.I,1984-06-19,Masculino,42
+Jorge Torres,1951595589,Sura,C.C,1980-05-21,Masculino,46
+Marta Ruiz,1102685952,Compensar,C.C,1962-02-21,Femenino,64
+Gabriel Castro,1593909051,Sura,C.C,1981-07-01,Femenino,45
+Lucía Morales,1508643722,Compensar,T.I,1987-08-02,Femenino,39
+Andrés Silva,1609369333,Salud Total,C.C,1985-10-15,Femenino,41
+Sofía Vargas,1061312629,Salud Total,T.I,1966-10-25,Femenino,60
+Diego Mendoza,1187810392,Sanitas,T.I,1983-03-09,Masculino,43

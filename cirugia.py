@@ -28,6 +28,7 @@ CIRUGIA_COLUMNS = [
     "edad",
     "fecha_cirugia",
     "procedimiento",
+    "cirujano_cargo",
     "checklist_iniciado",
     "preop_completa",
     "firmas_preop_completas",
@@ -351,6 +352,7 @@ def empty_draft():
         "edad": 0,
         "fecha_cirugia": str(date.today()),
         "procedimiento": "",
+        "cirujano_cargo": "",
         "checklist_iniciado": False,
         "preop_completa": False,
         "firmas_preop_completas": False,
@@ -504,6 +506,7 @@ def finalize_draft_to_cirugia(paths: dict):
         "edad": draft.get("edad", 0),
         "fecha_cirugia": draft.get("fecha_cirugia", ""),
         "procedimiento": draft.get("procedimiento", ""),
+        "cirujano_cargo": draft.get("cirujano_cargo", ""),
         "checklist_iniciado": True,
         "preop_completa": draft.get("preop_completa", False),
         "firmas_preop_completas": draft.get("firmas_preop_completas", False),
@@ -731,6 +734,7 @@ def export_pdf(row: pd.Series, pdfs_dir: str, logo_path: str) -> str:
     c.drawString(470, page_height - 62, f"Procedimiento: {row.get('procedimiento', '')}")
     c.drawString(30, page_height - 76, f"Fecha nacimiento: {row.get('fecha_nacimiento', '')}")
     c.drawString(250, page_height - 76, f"Sexo: {row.get('sexo', '')}")
+    c.drawString(470, page_height - 76, f"Cirujano: {row.get('cirujano_cargo', '')}")
 
     if os.path.exists(logo_path):
         c.drawImage(ImageReader(logo_path), page_width - 120, page_height - 70, width=80, height=50, preserveAspectRatio=True, mask="auto")
@@ -1277,8 +1281,13 @@ def render_cirugia(data_dir: str = "data", assets_dir: str = "assets"):
                     fecha_cirugia_default = date.today()
                 fecha_cirugia = st.date_input("fecha_cirugia", value=fecha_cirugia_default, label_visibility="collapsed")
 
-            req_label("Procedimiento")
-            procedimiento = st.text_input("procedimiento", value=str(base_data.get("procedimiento", "")), label_visibility="collapsed")
+            cc1, cc2 = st.columns([2, 1])
+            with cc1:
+                req_label("Procedimiento")
+                procedimiento = st.text_input("procedimiento", value=str(base_data.get("procedimiento", "")), label_visibility="collapsed")
+            with cc2:
+                req_label("Cirujano a cargo")
+                cirujano_cargo = st.text_input("cirujano_cargo", value=str(base_data.get("cirujano_cargo", "")), label_visibility="collapsed")
             guardar_ingreso = st.form_submit_button("Guardar datos para iniciar checklist")
 
             if guardar_ingreso:
@@ -1295,6 +1304,8 @@ def render_cirugia(data_dir: str = "data", assets_dir: str = "assets"):
                     errors.append("La edad debe ser mayor que cero.")
                 if not procedimiento.strip():
                     errors.append("El procedimiento es obligatorio.")
+                if not cirujano_cargo.strip():
+                    errors.append("El nombre del cirujano a cargo es obligatorio.")
                 if errors:
                     show_errors(errors)
                 else:
@@ -1308,7 +1319,8 @@ def render_cirugia(data_dir: str = "data", assets_dir: str = "assets"):
                         "sexo": sexo,
                         "edad": int(edad),
                         "fecha_cirugia": str(fecha_cirugia),
-                        "procedimiento": procedimiento.strip(),
+                        "procedimiento": procedimiento,
+                        "cirujano_cargo": cirujano_cargo,
                         "checklist_iniciado": True,
                     })
                     st.session_state["cirugia_modo_borrador"] = True
