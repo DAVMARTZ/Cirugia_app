@@ -1,0 +1,107 @@
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Main Setup */
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-image: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    color: white;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+/* Sidebar Radio Buttons */
+[data-testid="stSidebar"] .st-eb {
+    color: white !important;
+}
+
+[data-testid="stSidebar"] .st-emotion-cache-1647z74 {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+
+/* Custom Cards */
+.st-emotion-cache-1kyx7g3 {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+}
+
+/* Title and Headers */
+h1 {
+    color: #1e3a8a !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.025em;
+}
+
+h2, h3 {
+    color: #334155 !important;
+    font-weight: 600 !important;
+}
+
+/* Buttons Styling */
+.stButton > button {
+    width: 100%;
+    border-radius: 8px !important;
+    background-color: #2563eb !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2) !important;
+}
+
+.stButton > button:hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* Inputs Styling */
+.stTextInput > div > div > input {
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Success/Info Messages */
+.stAlert {
+    border-radius: 12px !important;
+    border: none !important;
+}
+
+/* Stats Cards for Historia Clínica */
+.metric-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    text-align: center;
+    border-bottom: 4px solid #2563eb;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.metric-label {
+    font-size: 14px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
