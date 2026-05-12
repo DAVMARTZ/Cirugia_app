@@ -95,7 +95,10 @@ checklist = cargar_csv(
 
 # SIDEBAR DESIGN
 with st.sidebar:
-    st.image(RUTA_LOGO, width=150) if os.path.exists(RUTA_LOGO) else st.title("🏥 CirugíaApp")
+    if os.path.exists(RUTA_LOGO):
+        st.image(RUTA_LOGO, width=150)
+    else:
+        st.title("🏥 CirugíaApp")
     
     st.markdown(f"""
         <div style="background-color: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
